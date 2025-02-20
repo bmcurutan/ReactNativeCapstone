@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Image, ScrollView, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Profile from "../screens/Profile";
+import { handleFirstNameChange, validateEmail } from "../utils/utils"
 
 export default function Onboarding() {
   const [firstName, onChangeFirstName] = useState(''); 
   const isFirstNameEmpty = firstName.trim() === '';
+
   const [email, onChangeEmail] = useState(''); 
   const isEmailEmpty = email.trim() === '';
   const isEmailValid = validateEmail(email)
+  
   const [loggedIn, onLogin] = useState(false);
 
   useEffect(() => {
@@ -25,6 +28,8 @@ export default function Onboarding() {
   const handleLogin = async () => {
     if (!isFirstNameEmpty && isEmailValid) {
       await AsyncStorage.setItem('loggedIn', 'true');
+      await AsyncStorage.setItem('firstName', firstName);
+      await AsyncStorage.setItem('email', email);
       onLogin(true); 
     } 
   };
@@ -73,12 +78,6 @@ export default function Onboarding() {
   );
 }
 
-const validateEmail = (email) => {
-  return email.match(
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  );
-};
-
 const showAlert = (message) => {
   Alert.alert("", message, [
       {
@@ -86,7 +85,7 @@ const showAlert = (message) => {
         onPress: () => console.log("OK Pressed")
       }
     ],
-    { cancelable: true } // click outside to dismiss
+    { cancelable: true } 
   );
 };
 
@@ -99,6 +98,7 @@ const styles = StyleSheet.create({
     height: 80, 
     width: 240, 
     resizeMode: 'contain',
+    marginTop: 64
   },
   headerText: {
     padding: 48,

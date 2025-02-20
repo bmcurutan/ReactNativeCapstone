@@ -17,14 +17,12 @@ export default function Index() {
   // }
 
   return (
-    <>
-      <Stack.Navigator>
-        {!loggedIn ? (
-          <Stack.Screen name="Onboarding" component={Onboarding} />
-        ) : (
-          <Stack.Screen name="Profile" component={Profile} />
-        )}
-      </Stack.Navigator>
-    </>
+    <Stack.Navigator >
+      {!loggedIn ? (
+        <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }} />
+      ) : (
+        <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+      )}
+    </Stack.Navigator>
   );
 }
