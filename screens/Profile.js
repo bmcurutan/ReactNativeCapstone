@@ -1,46 +1,66 @@
 import React, { useState, useEffect } from 'react'; 
-import { Image, ScrollView, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { CheckBox } from 'react-native-elements';
 import { TextInputMask } from 'react-native-masked-text';
-import { handleFirstNameChange, validateEmail } from "../utils/utils"
+import { validateEmail } from '../utils/utils';
 
 export default function Profile() {
-    const [firstName, onChangeFirstName] = useState(''); 
+    const [firstName, setFirstName] = useState(''); 
     const isFirstNameEmpty = firstName.trim() === '';
 
-    const [lastName, onChangeLastName] = useState(''); 
-    const isLastNameEmpty = lastName.trim() === '';
+    const [lastName, setLastName] = useState(''); 
 
-    const [email, onChangeEmail] = useState(''); 
-    const isEmailEmpty = email.trim() === '';
-    const isEmailValid = validateEmail(email)
+    const [email, setEmail] = useState(''); 
+    const isEmailValid = email.trim() !== '' && validateEmail(email)
 
-    const [phone, onChangePhone] = useState('');
+    const [phone, setPhone] = useState('');
+    const isPhoneEmpty = phone.trim() === '';
     const isPhoneValid = phone.length === 12;
 
-    // useEffect(() => {
-    //     const getInfo = async () => {
-    //       const loginStatus = await AsyncStorage.getItem('loggedIn');
-    //       if (loginStatus === 'true') {
-    //         onLogin(true); 
-    //       }
-    //     };
+    const [isStatusesChecked, setStatuses] = useState('');
+    const [isPasswordChecked, setPassword] = useState('');
+    const [isOffersChecked, setOffers] = useState('');
+    const [isNewsletterChecked, setNewsletter] = useState('');
+
+    useEffect(() => {
+        const getInfo = async () => {
+    //       "ABC";
+          const firstName = await AsyncStorage.getItem('firstName');
+          console.log("TEST" + firstName);
+    //       onChangeFirstName(firstName); 
+        };
     
-    //     checkLoginStatus();
-    //   }, []);
+      getInfo();
+    }, []);
 
-  const handleFirstNameChange = (name) => {
+  const handleFirstName = (name) => {
     if (/^[A-Za-z’'-\s]*$/.test(name)) {
-        onChangeFirstName(name); 
+        setFirstName(name); 
     }
   };  
 
-  const handleLastNameChange = (name) => {
+  const handleLastName = (name) => {
     if (/^[A-Za-z’'-\s]*$/.test(name)) {
-        onChangeLastName(name); 
+        setLastName(name); 
     }
   };  
+
+  const handleLogout = async () => {
+    // getInfo();
+    // console.log("TESTTEST2");
+    // await AsyncStorage.setItem('loggedIn', 'false');
+    // navigation.reset({
+    //   index: 0,
+    //   routes: [{ name: 'Onboarding' }],
+    // });
+    // const test = await AsyncStorage.getItem('loggedIn');
+    // console.log("ABC" + test);
+  };
 
   const handleSave = async () => {
+    if (!isPhoneEmpty && !isPhoneValid) {
+      showAlert("Please enter a valid phone number")
+    }
     // if (!isFirstNameEmpty && isEmailValid) {
     //   await AsyncStorage.setItem('loggedIn', 'true');
     //   await AsyncStorage.setItem('firstName', firstName);
@@ -49,54 +69,6 @@ export default function Profile() {
     // } 
   };
 
-  return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Image style={styles.image}
-            source={require('../assets/images/little-lemon-logo.png')} />
-
-        <Text style={styles.headerText}>Personal Information</Text>
-
-        <Text style={styles.inputLabel}>First Name</Text>
-        <TextInput style={styles.input}
-            value={firstName} 
-            onChangeText={handleFirstNameChange}
-        /> 
-
-        <Text style={styles.inputLabel}>Last Name</Text>
-        <TextInput style={styles.input}
-            value={lastName} 
-            onChangeText={handleLastNameChange}
-        /> 
-
-        <Text style={styles.inputLabel}>Email</Text>
-        <TextInput style={styles.input}
-            value={email} 
-            onChangeText={onChangeEmail} 
-            keyboardType='email-address'
-            textContentType='emailAddress'
-        /> 
-
-        <Text style={styles.inputLabel}>Phone</Text>
-        <TextInputMask style={styles.input}
-            type={'custom'}
-            options={{
-              mask: '999-999-9999', 
-            }}
-            value={phone} 
-            onChangeText={onChangePhone} 
-        /> 
-
-        {/* <Pressable
-            onPress={handleLogin}
-            style={[styles.buttonContainer, 
-            (isFirstNameEmpty || !isEmailValid) && styles.buttonDisabled]} 
-            disabled={isEmailEmpty}>
-            <Text style={styles.button}>Next</Text>
-        </Pressable> */}
-      </ScrollView>
-    );
-  }
-  
   const showAlert = (message) => {
     Alert.alert("", message, [
         {
@@ -104,55 +76,142 @@ export default function Profile() {
           onPress: () => console.log("OK Pressed")
         }
       ],
-      { cancelable: true } // click outside to dismiss
+      { cancelable: true } 
     );
   };
-  
+
+  return (
+      <ScrollView contentContainerStyle={styles.container}>
+        <Image style={styles.headerImage}
+            source={require('../assets/images/little-lemon-logo.png')} />
+
+        <Text style={styles.headerText}>Personal Information</Text>
+
+        <Text style={styles.inputLabel}>First Name</Text>
+        <TextInput style={styles.input}
+            value={firstName} 
+            onChangeText={handleFirstName}
+        /> 
+
+        <Text style={styles.inputLabel}>Last Name</Text>
+        <TextInput style={styles.input}
+            value={lastName} 
+            onChangeText={handleLastName}
+        /> 
+
+        <Text style={styles.inputLabel}>Email</Text>
+        <TextInput style={styles.input}
+            value={email} 
+            onChangeText={setEmail} 
+            keyboardType='email-address'
+            textContentType='emailAddress'
+        /> 
+
+        <Text style={styles.inputLabel}>Phone</Text>
+        <TextInputMask style={styles.input}
+            type={'custom'}
+            options={{ mask: '999-999-9999' }}
+            value={phone} 
+            onChangeText={setPhone} 
+        /> 
+
+        <Text style={styles.headerText}>Email Notifications</Text>
+
+        <View style={styles.rowContainer}>
+          <CheckBox value={isStatusesChecked} onValueChange={setStatuses} />
+          <Text style={styles.checkboxLabel}>Order Statuses</Text>
+        </View>
+
+        <View style={styles.rowContainer}>
+          <CheckBox value={isPasswordChecked} onValueChange={setPassword} />
+          <Text style={styles.checkboxLabel}>Password Changes</Text>
+        </View>
+
+        <View style={styles.rowContainer}>
+          <CheckBox value={isOffersChecked} onValueChange={setOffers} />
+          <Text style={styles.checkboxLabel}>Special Offers</Text>
+        </View>
+
+        <View style={styles.rowContainer}>
+          <CheckBox value={isNewsletterChecked} onValueChange={setNewsletter} />
+          <Text style={styles.checkboxLabel}>Newsletter</Text>
+        </View>
+
+        <View style={styles.rowContainer}>
+          <Pressable
+              onPress={handleLogout}
+              style={[styles.buttonContainer]}>
+              <Text style={styles.button}>Log Out</Text>
+          </Pressable>
+
+          <Pressable
+              onPress={handleSave}
+              style={[styles.buttonContainer, 
+              (isFirstNameEmpty || !isEmailValid) && styles.buttonDisabled]} 
+              disabled={isFirstNameEmpty || !isEmailValid }>
+              <Text style={styles.button}>Save</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    );
+  }
+    
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      alignItems: 'center',
+      flex: 1
     },
-    image: {
+    headerImage: {
       height: 40, 
-      width: 320, 
+      width: '100%', 
       resizeMode: 'contain',
       marginTop: 64
     },
     headerText: {
-      padding: 24,
+      paddingTop: 16,
+      paddingBottom: 16,
       fontSize: 22,
-      color: '#3B4C45',
+      color: '#3B4C45'
     },
     inputLabel: {
       fontSize: 16, 
-      paddingTop: 8
+      paddingTop: 8,
+      paddingBottom: 4
     },
     input: { 
       height: 36, 
-      width: '100%',
-      margin: 8, 
+      width: '98%',
+      marginBottom: 16, 
       padding: 8, 
       fontSize: 16, 
-      borderColor: 'black', 
+      borderColor: '#3B4C45', 
       borderWidth: 1,
-      borderRadius: 8,
+      borderRadius: 8
     }, 
     buttonContainer: {
-      margin: 48,
+      marginTop: 24,
+      marginRight: 16,
       backgroundColor: '#3B4C45',
       borderRadius: 8,
-      width: 100,
-      height: 48
+      width: '40%',
+      height: 44
     },
     button: {
       textAlign: 'center',
-      fontSize: 24, 
+      fontSize: 22, 
       color: 'white',
-      padding: 8,
+      padding: 8
     },
     buttonDisabled: {
       backgroundColor: 'gray',
+    },
+    rowContainer: {
+      width: '100%',
+      flexDirection: 'row', 
+      alignItems: 'center',
+      marginTop: -8
+    },
+    checkboxLabel: {
+      fontSize: 16
     },
   });
   

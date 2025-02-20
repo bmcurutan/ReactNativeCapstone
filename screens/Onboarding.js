@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react'; 
-import { Image, ScrollView, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Profile from "../screens/Profile";
-import { handleFirstNameChange, validateEmail } from "../utils/utils"
+import { validateEmail } from '../utils/utils';
+import Profile from '../screens/Profile';
 
 export default function Onboarding() {
-  const [firstName, onChangeFirstName] = useState(''); 
+  const [firstName, setFirstName] = useState(''); 
   const isFirstNameEmpty = firstName.trim() === '';
 
-  const [email, onChangeEmail] = useState(''); 
-  const isEmailEmpty = email.trim() === '';
-  const isEmailValid = validateEmail(email)
+  const [email, setEmail] = useState(''); 
+  const isEmailValid = email.trim() !== '' && validateEmail(email);
   
-  const [loggedIn, onLogin] = useState(false);
+  const [loggedIn, setLogin] = useState(false);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       const loginStatus = await AsyncStorage.getItem('loggedIn');
       if (loginStatus === 'true') {
-        onLogin(true); 
+        setLogin(true); 
       }
     };
-
     checkLoginStatus();
   }, []);
 
@@ -34,9 +32,9 @@ export default function Onboarding() {
     } 
   };
 
-  const handleFirstNameChange = (name) => {
+  const handleFirstName = (name) => {
     if (/^[A-Za-z’'-\s]*$/.test(name)) {
-      onChangeFirstName(name); 
+      setFirstName(name); 
     }
   };  
 
@@ -44,7 +42,7 @@ export default function Onboarding() {
     <ScrollView contentContainerStyle={styles.container}>
       {!loggedIn ? (
         <>
-          <Image style={styles.image}
+          <Image style={styles.headerImage}
               source={require('../assets/images/little-lemon-logo.png')} />
 
           <Text style={styles.headerText}>Let us get to know you</Text>
@@ -52,13 +50,13 @@ export default function Onboarding() {
           <Text style={styles.inputLabel}>First Name</Text>
           <TextInput style={styles.input}
             value={firstName} 
-            onChangeText={handleFirstNameChange}
+            onChangeText={handleFirstName}
           /> 
 
           <Text style={styles.inputLabel}>Email</Text>
           <TextInput style={styles.input}
             value={email} 
-            onChangeText={onChangeEmail} 
+            onChangeText={setEmail} 
             keyboardType='email-address'
             textContentType='emailAddress'
           /> 
@@ -67,7 +65,7 @@ export default function Onboarding() {
             onPress={handleLogin}
             style={[styles.buttonContainer, 
               (isFirstNameEmpty || !isEmailValid) && styles.buttonDisabled]} 
-            disabled={isEmailEmpty}>
+            disabled={isFirstNameEmpty || !isEmailValid}>
               <Text style={styles.button}>Next</Text>
           </Pressable>
         </>
@@ -78,23 +76,12 @@ export default function Onboarding() {
   );
 }
 
-const showAlert = (message) => {
-  Alert.alert("", message, [
-      {
-        text: "OK", 
-        onPress: () => console.log("OK Pressed")
-      }
-    ],
-    { cancelable: true } 
-  );
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'center'
   },
-  image: {
+  headerImage: {
     height: 80, 
     width: 240, 
     resizeMode: 'contain',
@@ -114,9 +101,9 @@ const styles = StyleSheet.create({
     margin: 16, 
     padding: 8, 
     fontSize: 18, 
-    borderColor: 'black', 
+    borderColor: '#3B4C45', 
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 8
   }, 
   buttonContainer: {
     margin: 48,
@@ -129,9 +116,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 24, 
     color: 'white',
-    padding: 8,
+    padding: 8
   },
   buttonDisabled: {
-    backgroundColor: 'gray',
+    backgroundColor: 'gray'
   },
 });
