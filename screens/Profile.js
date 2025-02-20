@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { TextInputMask } from 'react-native-masked-text';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { validateEmail } from '../utils/utils';
 
-export default function Profile() {
+export default function Profile({ navigation }) {
     const [firstName, setFirstName] = useState(''); 
     const isFirstNameEmpty = firstName.trim() === '';
 
@@ -46,15 +47,9 @@ export default function Profile() {
   };  
 
   const handleLogout = async () => {
-    // getInfo();
-    // console.log("TESTTEST2");
-    // await AsyncStorage.setItem('loggedIn', 'false');
-    // navigation.reset({
-    //   index: 0,
-    //   routes: [{ name: 'Onboarding' }],
-    // });
-    // const test = await AsyncStorage.getItem('loggedIn');
-    // console.log("ABC" + test);
+    console.log("Log out tapped");
+    await AsyncStorage.removeItem('loggedIn'); 
+    navigation.navigate('Onboarding');
   };
 
   const handleSave = async () => {
@@ -158,7 +153,8 @@ export default function Profile() {
     
   const styles = StyleSheet.create({
     container: {
-      flex: 1
+      flex: 1,
+      marginHorizontal: 16
     },
     headerImage: {
       height: 40, 
@@ -167,8 +163,7 @@ export default function Profile() {
       marginTop: 64
     },
     headerText: {
-      paddingTop: 16,
-      paddingBottom: 16,
+      paddingVertical: 16,
       fontSize: 22,
       color: '#3B4C45'
     },
@@ -193,11 +188,11 @@ export default function Profile() {
       backgroundColor: '#3B4C45',
       borderRadius: 8,
       width: '40%',
-      height: 44
+      height: 40
     },
     button: {
       textAlign: 'center',
-      fontSize: 22, 
+      fontSize: 20, 
       color: 'white',
       padding: 8
     },
