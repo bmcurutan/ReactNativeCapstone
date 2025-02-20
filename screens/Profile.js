@@ -101,6 +101,12 @@ export default function Profile({ navigation }) {
 
   return (
       <ScrollView contentContainerStyle={styles.container}>
+        <Pressable
+            onPress={handleSave}
+            style={styles.backButtonContainer}>
+            <Text style={styles.button}>←</Text>
+        </Pressable>
+
         <Image style={styles.headerImage}
             source={require('../assets/images/little-lemon-logo.png')} />
 
@@ -193,7 +199,7 @@ export default function Profile({ navigation }) {
       height: 40, 
       width: '100%', 
       resizeMode: 'contain',
-      marginTop: 64
+      marginTop: -30
     },
     headerText: {
       paddingVertical: 16,
@@ -223,6 +229,15 @@ export default function Profile({ navigation }) {
       width: '40%',
       height: 40,
       justifyContent: 'center'
+    },
+    backButtonContainer: {
+      marginTop: 64,
+      height: 40,
+      width: 40,
+      borderRadius: 20,
+      backgroundColor: '#3B4C45',
+      justifyContent: 'center',
+      alignContent: 'center'
     },
     logoutButtonContainer: {
       backgroundColor: '#F4CE14'
