@@ -168,8 +168,8 @@ export default function Profile({ navigation }) {
         <View style={styles.rowContainer}>
           <Pressable
               onPress={handleLogout}
-              style={[styles.buttonContainer]}>
-              <Text style={styles.button}>Log Out</Text>
+              style={[styles.buttonContainer, styles.logoutButtonContainer]}>
+              <Text style={[styles.button, styles.logoutButton]}>Log Out</Text>
           </Pressable>
 
           <Pressable
@@ -221,13 +221,20 @@ export default function Profile({ navigation }) {
       backgroundColor: '#3B4C45',
       borderRadius: 8,
       width: '40%',
-      height: 40
+      height: 40,
+      justifyContent: 'center'
+    },
+    logoutButtonContainer: {
+      backgroundColor: '#F4CE14'
     },
     button: {
       textAlign: 'center',
-      fontSize: 20, 
+      fontSize: 18, 
       color: 'white',
       padding: 8
+    },
+    logoutButton: {
+      color: 'black'
     },
     buttonDisabled: {
       backgroundColor: 'gray',
