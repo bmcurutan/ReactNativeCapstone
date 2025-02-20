@@ -1,5 +1,7 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import { Image, ScrollView, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Profile from "../screens/Profile";
 
 export default function Onboarding() {
   const [firstName, onChangeFirstName] = useState(''); 
@@ -7,6 +9,25 @@ export default function Onboarding() {
   const [email, onChangeEmail] = useState(''); 
   const isEmailEmpty = email.trim() === '';
   const isEmailValid = validateEmail(email)
+  const [loggedIn, onLogin] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const loginStatus = await AsyncStorage.getItem('loggedIn');
+      if (loginStatus === 'true') {
+        onLogin(true); 
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  const handleLogin = async () => {
+    if (!isFirstNameEmpty && isEmailValid) {
+      await AsyncStorage.setItem('loggedIn', 'true');
+      onLogin(true); 
+    } 
+  };
 
   const handleFirstNameChange = (name) => {
     if (/^[A-Za-z’'-\s]*$/.test(name)) {
@@ -16,36 +37,38 @@ export default function Onboarding() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image style={styles.image}
-          source={require('../assets/images/little-lemon-logo.png')} />
+      {!loggedIn ? (
+        <>
+          <Image style={styles.image}
+              source={require('../assets/images/little-lemon-logo.png')} />
 
-      <Text style={styles.headerText}>Let us get to know you</Text>
+          <Text style={styles.headerText}>Let us get to know you</Text>
 
-      <Text style={styles.inputLabel}>First Name</Text>
-      <TextInput style={styles.input}
-        value={firstName} 
-        onChangeText={handleFirstNameChange}
-      /> 
+          <Text style={styles.inputLabel}>First Name</Text>
+          <TextInput style={styles.input}
+            value={firstName} 
+            onChangeText={handleFirstNameChange}
+          /> 
 
-      <Text style={styles.inputLabel}>Email</Text>
-      <TextInput style={styles.input}
-        value={email} 
-        onChangeText={onChangeEmail} 
-        keyboardType='email-address'
-        textContentType='emailAddress'
-      /> 
+          <Text style={styles.inputLabel}>Email</Text>
+          <TextInput style={styles.input}
+            value={email} 
+            onChangeText={onChangeEmail} 
+            keyboardType='email-address'
+            textContentType='emailAddress'
+          /> 
 
-      <Pressable
-        onPress={() => {
-          if (!isFirstNameEmpty && isEmailValid) {
-            // TODO
-          } 
-        }}
-        style={[styles.buttonContainer, 
-          (isFirstNameEmpty || !isEmailValid) && styles.buttonDisabled]} 
-        disabled={isEmailEmpty}>
-          <Text style={styles.button}>Next</Text>
-      </Pressable>
+          <Pressable
+            onPress={handleLogin}
+            style={[styles.buttonContainer, 
+              (isFirstNameEmpty || !isEmailValid) && styles.buttonDisabled]} 
+            disabled={isEmailEmpty}>
+              <Text style={styles.button}>Next</Text>
+          </Pressable>
+        </>
+      ) : (
+        <Profile />
+      )}
     </ScrollView>
   );
 }
