@@ -22,6 +22,7 @@ export default function Onboarding({ navigation }) {
 
   const handleLogin = async () => {
     console.log("Log in tapped")
+    
     if (!isFirstNameEmpty && isEmailValid) {
       await AsyncStorage.setItem('loggedIn', 'true');
       await AsyncStorage.setItem('firstName', firstName);

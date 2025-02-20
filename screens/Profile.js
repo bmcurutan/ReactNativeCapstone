@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'; 
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { TextInputMask } from 'react-native-masked-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,20 +15,34 @@ export default function Profile({ navigation }) {
     const isEmailValid = email.trim() !== '' && validateEmail(email)
 
     const [phone, setPhone] = useState('');
-    const isPhoneEmpty = phone.trim() === '';
-    const isPhoneValid = phone.length === 12;
+    const isPhoneValid = phone === null || phone.length === 12;
 
-    const [isStatusesChecked, setStatuses] = useState('');
-    const [isPasswordChecked, setPassword] = useState('');
-    const [isOffersChecked, setOffers] = useState('');
-    const [isNewsletterChecked, setNewsletter] = useState('');
+    const [isStatusesChecked, setStatuses] = useState(false);
+    const [isPasswordChecked, setPassword] = useState(false);
+    const [isOffersChecked, setOffers] = useState(false);
+    const [isNewsletterChecked, setNewsletter] = useState(false);
 
     useEffect(() => {
         const getInfo = async () => {
-    //       "ABC";
           const firstName = await AsyncStorage.getItem('firstName');
-          console.log("TEST" + firstName);
-    //       onChangeFirstName(firstName); 
+          const lastName = await AsyncStorage.getItem('lastName');
+          const email = await AsyncStorage.getItem('email');
+          const phone = await AsyncStorage.getItem('phone');
+
+          setFirstName(firstName); 
+          setLastName(lastName);
+          setEmail(email);
+          setPhone(phone);
+
+          const statuses = await AsyncStorage.getItem('statuses');
+          const password = await AsyncStorage.getItem('password');
+          const offers = await AsyncStorage.getItem('offers');
+          const newsletter = await AsyncStorage.getItem('newsletter');
+
+          setStatuses(statuses === 'true' ? true : false);
+          setPassword(password === 'true' ? true : false);
+          setOffers(offers === 'true' ? true : false);
+          setNewsletter(newsletter === 'true' ? true : false);
         };
     
       getInfo();
@@ -48,27 +62,37 @@ export default function Profile({ navigation }) {
 
   const handleLogout = async () => {
     console.log("Log out tapped");
+
     await AsyncStorage.removeItem('loggedIn'); 
     navigation.navigate('Onboarding');
   };
 
   const handleSave = async () => {
-    if (!isPhoneEmpty && !isPhoneValid) {
-      showAlert("Please enter a valid phone number")
+    console.log("Save tapped");
+
+    if (!isPhoneValid) {
+      showAlert("Please enter a valid phone number or clear the input field")
+
+    } else {
+      showAlert("Profile saved")
+
+      await AsyncStorage.setItem('firstName', firstName);
+      await AsyncStorage.setItem('lastName', lastName);
+      await AsyncStorage.setItem('email', email);
+      await AsyncStorage.setItem('phone', phone);
+
+      await AsyncStorage.setItem('statuses', isStatusesChecked ? 'true' : 'false');
+      await AsyncStorage.setItem('password', isPasswordChecked ? 'true' : 'false');
+      await AsyncStorage.setItem('offers', isOffersChecked ? 'true' : 'false');
+      await AsyncStorage.setItem('newsletter', isNewsletterChecked ? 'true' : 'false');
     }
-    // if (!isFirstNameEmpty && isEmailValid) {
-    //   await AsyncStorage.setItem('loggedIn', 'true');
-    //   await AsyncStorage.setItem('firstName', firstName);
-    //   await AsyncStorage.setItem('email', email);
-    //   onLogin(true); 
-    // } 
   };
 
   const showAlert = (message) => {
     Alert.alert("", message, [
         {
           text: "OK", 
-          onPress: () => console.log("OK Pressed")
+          onPress: () => console.log("OK tapped")
         }
       ],
       { cancelable: true } 
@@ -108,27 +132,36 @@ export default function Profile({ navigation }) {
             options={{ mask: '999-999-9999' }}
             value={phone} 
             onChangeText={setPhone} 
+            keyboardType='phone-pad'
         /> 
 
         <Text style={styles.headerText}>Email Notifications</Text>
 
         <View style={styles.rowContainer}>
-          <CheckBox value={isStatusesChecked} onValueChange={setStatuses} />
+          <CheckBox checkedColor="#3B4C45"
+            checked={isStatusesChecked} 
+            onPress={() => setStatuses(!isStatusesChecked)} />
           <Text style={styles.checkboxLabel}>Order Statuses</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox value={isPasswordChecked} onValueChange={setPassword} />
+          <CheckBox checkedColor="#3B4C45"
+            checked={isPasswordChecked} 
+            onPress={() => setPassword(!isPasswordChecked)} />
           <Text style={styles.checkboxLabel}>Password Changes</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox value={isOffersChecked} onValueChange={setOffers} />
+          <CheckBox checkedColor="#3B4C45"
+            checked={isOffersChecked}
+            onPress={() => setOffers(!isOffersChecked)} />
           <Text style={styles.checkboxLabel}>Special Offers</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox value={isNewsletterChecked} onValueChange={setNewsletter} />
+          <CheckBox checkedColor="#3B4C45"
+            checked={isNewsletterChecked}
+            onPress={() => setNewsletter(!isNewsletterChecked)} />
           <Text style={styles.checkboxLabel}>Newsletter</Text>
         </View>
 
