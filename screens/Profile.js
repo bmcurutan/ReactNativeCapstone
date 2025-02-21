@@ -206,8 +206,8 @@ export default function Profile({ navigation }) {
           </Pressable>
           <Pressable
               onPress={handleRemoveAvatar}
-              style={styles.buttonContainer}>
-              <Text style={styles.button}>Remove</Text>
+              style={[styles.buttonContainer, styles.secondaryContainer]}>
+              <Text style={[styles.button, styles.secondaryButton]}>Remove</Text>
           </Pressable>
         </View>
 
@@ -348,6 +348,12 @@ export default function Profile({ navigation }) {
       height: 40,
       justifyContent: 'center'
     },
+    secondaryContainer: {
+      backgroundColor: 'white',
+      borderColor: '#3B4C45',
+      borderWidth: 1,
+      borderRadius: 8,
+    },
     backButtonContainer: {
       marginTop: 64,
       height: 40,
@@ -364,6 +370,10 @@ export default function Profile({ navigation }) {
       textAlign: 'center',
       fontSize: 18, 
       color: 'white',
+      padding: 8
+    },
+    secondaryButton: {
+      color: '#3B4C45',
       padding: 8
     },
     logoutButton: {
