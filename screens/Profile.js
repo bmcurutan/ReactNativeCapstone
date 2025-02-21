@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'; 
-import { Alert, Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { TextInputMask } from 'react-native-masked-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,7 +26,7 @@ export default function Profile({ navigation }) {
   const [isNewsletterChecked, setNewsletter] = useState(false);
 
   useEffect(() => {
-      const getInfo = async () => {
+      const getInfo = async() => {
         const avatar = await AsyncStorage.getItem('avatar');
         setAvatar(avatar)
 
@@ -45,14 +45,14 @@ export default function Profile({ navigation }) {
         const offers = await AsyncStorage.getItem('offers');
         const newsletter = await AsyncStorage.getItem('newsletter');
 
-        setStatuses(statuses === 'true' ? true : false);
-        setPassword(password === 'true' ? true : false);
-        setOffers(offers === 'true' ? true : false);
-        setNewsletter(newsletter === 'true' ? true : false);
+        setStatuses(statuses === 'true');
+        setPassword(password === 'true');
+        setOffers(offers === 'true');
+        setNewsletter(newsletter === 'true');
       };
   
-    getInfo();
-  }, []);
+      getInfo();
+    }, []);
 
   const handleFirstName = (name) => {
     if (/^[A-Za-z’'-\s]*$/.test(name)) {
@@ -66,12 +66,12 @@ export default function Profile({ navigation }) {
     }
   };  
 
-  const handleLogout = async () => {
+  const handleLogout = async() => {
     console.log('Log out tapped');
 
     showAlert(
       'Are you sure you want to log out?',
-      async () => {
+      async() => {
         await AsyncStorage.removeItem('loggedIn'); 
         navigation.navigate('Onboarding');
       },
@@ -79,24 +79,24 @@ export default function Profile({ navigation }) {
     );
   };
 
-  const handleUpdateAvatar = async () => {
+  const handleUpdateAvatar = async() => {
     console.log('Update tapped');
 
     showAlert(
       'Are you sure you want to update your avatar?',
-      async () => {
+      async() => {
         pickImage()
       },
       () => {}
     );
   };
 
-  const handleRemoveAvatar = async () => {
+  const handleRemoveAvatar = async() => {
     console.log('Remove tapped');
 
     showAlert(
       'Are you sure you want to remove your avatar?',
-      async () => {
+      async() => {
         await AsyncStorage.removeItem('avatar'); 
         setAvatar(null);
       },
@@ -104,11 +104,13 @@ export default function Profile({ navigation }) {
     );
   };
 
-  const handleBack = {
+  const handleBack = () => {
+    console.log('Back tapped');
 
+    navigation.pop();
   };
 
-  const handleSave = async () => {
+  const handleSave = async() => {
     console.log('Save tapped');
 
     if (!isPhoneValid) {
@@ -129,7 +131,7 @@ export default function Profile({ navigation }) {
     }
   };
 
-  const pickImage = async () => {
+  const pickImage = async() => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
@@ -192,7 +194,7 @@ export default function Profile({ navigation }) {
         <View style={styles.rowContainer}>  
           <View style={styles.avatarContainer}>
           {!avatar &&
-            <Text style={styles.avatarText}>{firstName[0]}{lastName[0]}</Text>
+            <Text style={styles.avatarText}>{firstName[0]}{lastName === null ? '' : lastName[0]}</Text>
           }
           {avatar &&
             <Image style={styles.avatarImage}
@@ -356,9 +358,9 @@ export default function Profile({ navigation }) {
     },
     backButtonContainer: {
       marginTop: 64,
-      height: 40,
-      width: 40,
-      borderRadius: 20,
+      height: 50,
+      width: 50,
+      borderRadius: 25,
       backgroundColor: '#3B4C45',
       justifyContent: 'center',
       alignContent: 'center'
