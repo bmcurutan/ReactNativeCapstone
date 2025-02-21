@@ -46,7 +46,25 @@ export default function Home({ navigation }) {
       } 
     };
 
-    fetchData();
+    const getData = async () => {
+      try {
+        let menuItems = getMenuItems();
+        console.log(menuItems);
+        // console.log("TEST" + menuItems.length);
+        // // if (!menuItems.length) {
+        //   // menuItems = await fetchData();
+        //   // console.log(menuItems);
+        // //   saveMenuItems(menuItems);
+        // // }
+
+        // setData(menuItems);
+
+      } catch(e) {
+        Alert.alert(e.message);
+      }
+    };
+
+    getData();
   }, []);
 
   const handleProfile = () => {

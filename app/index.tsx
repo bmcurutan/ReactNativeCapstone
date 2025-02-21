@@ -28,15 +28,10 @@ export default function Index() {
   }
 
   return (
-    <Stack.Navigator>
-      {loggedIn ? (
-        <>
-          <Stack.Screen name='Home' component={Home} options={{ headerShown: false }} />
-          <Stack.Screen name='Profile' component={Profile} options={{ headerShown: false }} />
-        </>
-      ) : (
-          <Stack.Screen name='Onboarding' component={Onboarding} options={{ headerShown: false }} />
-      )}
+    <Stack.Navigator initialRouteName={loggedIn === true ? 'Home' : 'Onboarding'}>
+        <Stack.Screen name='Home' component={Home} options={{ headerShown: false }} />
+        <Stack.Screen name='Profile' component={Profile} options={{ headerShown: false }} />
+        <Stack.Screen name='Onboarding' component={Onboarding} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }

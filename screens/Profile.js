@@ -117,7 +117,8 @@ export default function Profile({ navigation }) {
       showAlert('Please enter a valid phone number or clear the input field');
 
     } else {
-      showAlert('Profile saved')
+      showAlert('Profile saved');
+      navigation.pop()
 
       await AsyncStorage.setItem('firstName', firstName);
       await AsyncStorage.setItem('lastName', lastName);
@@ -128,8 +129,6 @@ export default function Profile({ navigation }) {
       await AsyncStorage.setItem('password', isPasswordChecked ? 'true' : 'false');
       await AsyncStorage.setItem('offers', isOffersChecked ? 'true' : 'false');
       await AsyncStorage.setItem('newsletter', isNewsletterChecked ? 'true' : 'false');
-
-      navigation.pop();
     }
   };
 
@@ -152,22 +151,8 @@ export default function Profile({ navigation }) {
   const showAlert = (message, onAffirmative, onNegative) => {
     var buttons = []
 
-    if (onNegative !== null) {
-      buttons.concat(
-      {
-        text: 'No',
-        onPress: () => {
-          if (onNegative) {
-            onNegative();
-          } else {
-            console.log('No tapped'); 
-          }
-        },
-      });
-    }
-
-    if (onAffirmative !== null) {
-      buttons.concat(
+    if (onAffirmative != null) {
+      buttons.push(
         {
           text: 'Yes', 
           onPress: () => {
@@ -180,8 +165,22 @@ export default function Profile({ navigation }) {
         });
     }
 
+    if (onNegative != null) {
+      buttons.push(
+      {
+        text: 'No',
+        onPress: () => {
+          if (onNegative) {
+            onNegative();
+          } else {
+            console.log('No tapped'); 
+          }
+        },
+      });
+    }
+
     if (onNegative === null && onAffirmative === null) {
-      buttons.concat(
+      buttons.push(
         {
           text: "OK", 
           onPress: () => console.log("OK Pressed")
@@ -191,7 +190,7 @@ export default function Profile({ navigation }) {
     Alert.alert(
       '',
       message,
-      [buttons],
+      buttons,
       { cancelable: true }
     );
   };
@@ -225,12 +224,11 @@ export default function Profile({ navigation }) {
               style={styles.buttonContainer}>
               <Text style={styles.button}>Update</Text>
           </Pressable>
-          <Pressable
+          {avatar && <Pressable
               onPress={handleRemoveAvatar}
-              style={[styles.buttonContainer, styles.secondaryContainer]}
-              disabled={avatar === null}>
+              style={[styles.buttonContainer, styles.secondaryContainer]}>
               <Text style={[styles.button, styles.secondaryButton]}>Remove</Text>
-          </Pressable>
+          </Pressable>}
         </View>
 
         <Text style={styles.inputLabel}>First Name</Text>
