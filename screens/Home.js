@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react'; 
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home({ navigation }) {
   const [avatar, setAvatar] = useState(null);
   const [firstInitial, setFirstInitial] = useState(''); 
   const [lastInitial, setLastInitial] = useState(''); 
+  const [data, setData] = useState([]);
+
+  const API_URL =
+  'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
 
   useEffect(() => {
     const getInfo = async() => {
@@ -16,10 +20,33 @@ export default function Home({ navigation }) {
       const lastName = await AsyncStorage.getItem('lastName');
 
       setFirstInitial(firstName[0]); 
-      setLastInitial(lastName[0]);
+      setLastInitial(lastName === null ? '' : lastName[0]);
     };
   
     getInfo();
+
+    const fetchData = async() => {
+      try { 
+        const response = await fetch(API_URL);
+        const json = await response.json();
+  
+        const mappedData = json.menu.map(item => ({
+          name: item.name,
+          price: item.price,
+          description: item.description,
+          image: item.image,
+          category: item.category
+        }));
+        // console.log(mappedData);
+        setData(mappedData)
+        return mappedData;
+  
+      } catch (error) {
+        console.error(error);
+      } 
+    };
+
+    fetchData();
   }, []);
 
   const handleProfile = () => {
@@ -27,18 +54,38 @@ export default function Home({ navigation }) {
     navigation.navigate('Profile');
   };  
 
+  const Item = ({ name, price, description, image, category }) => {
+    const imageUrl = `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${image}?raw=true`;
+    // console.log(imageUrl); 
+  
+    return (
+      <View style={styles.item}>
+        <View style={styles.rowContainer}>  
+          <Image style={styles.image} source={{ uri: imageUrl }} />
+          <View>
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.description}>{description}</Text>
+            <Text style={styles.price}>${price}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const renderItem = ({ item }) => <Item name={item.name} price={item.price} description={item.description} image={item.image} category={item.category} />;
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Pressable 
         style={styles.avatarButtonContainer}
         onPress={handleProfile}>
-        {/* {!avatar && */}
+        {!avatar &&
           <Text style={styles.avatarText}>{firstInitial}{lastInitial}</Text>
-        {/* }
+        }
         {avatar &&
           <Image style={styles.avatarImage}
             source={{url: avatar}} />
-        } */}
+        }
       </Pressable>
 
       <Image style={styles.logoImage}
@@ -51,6 +98,12 @@ export default function Home({ navigation }) {
         
         <Image style={styles.headerImage}
           source={require('../assets/images/bruschetta.jpg')} />
+      </View>
+
+      <View style={styles.menuContainer}>
+        <FlatList data={data} 
+          keyExtractor={item => item.name} 
+          renderItem={renderItem} />
       </View>
     </ScrollView>
   );
@@ -86,7 +139,8 @@ const styles = StyleSheet.create({
     },
     headerImage: {
       width: '100%',
-      height: 200,
+      height: 160,
+
       resizeMode: 'contain',
       marginTop: 16,
       borderRadius: 16
@@ -116,5 +170,38 @@ const styles = StyleSheet.create({
       fontSize: 16,
       textAlign: 'center',
       color: 'white'
-    }
+    },
+    name: {
+      fontSize: 18,
+      fontWeight: 'bold'
+    },
+    description: {
+      fontSize: 14,
+      marginVertical: 8,
+      width: 280
+    },
+    price: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: 'gray',
+      marginBottom: 16
+    },
+    menuContainer: {
+      paddingHorizontal: 16
+    },
+    item: {
+      borderBottomWidth: 0.5,
+      borderColor: 'gray',
+      paddingTop: 16
+    },
+    image: {
+      width: 70, 
+      height: 70,
+      borderRadius: 8,
+      marginRight: 8
+    },
+    rowContainer: {
+      width: '100%',
+      flexDirection: 'row'
+    },
 });
