@@ -128,6 +128,8 @@ export default function Profile({ navigation }) {
       await AsyncStorage.setItem('password', isPasswordChecked ? 'true' : 'false');
       await AsyncStorage.setItem('offers', isOffersChecked ? 'true' : 'false');
       await AsyncStorage.setItem('newsletter', isNewsletterChecked ? 'true' : 'false');
+
+      navigation.pop();
     }
   };
 
@@ -148,20 +150,24 @@ export default function Profile({ navigation }) {
   };
 
   const showAlert = (message, onAffirmative, onNegative) => {
-    Alert.alert(
-      '',
-      message,
-      [
-        {
-          text: 'No',
-          onPress: () => {
-            if (onNegative) {
-              onNegative();
-            } else {
-              console.log('No tapped'); 
-            }
-          },
+    var buttons = []
+
+    if (onNegative !== null) {
+      buttons.concat(
+      {
+        text: 'No',
+        onPress: () => {
+          if (onNegative) {
+            onNegative();
+          } else {
+            console.log('No tapped'); 
+          }
         },
+      });
+    }
+
+    if (onAffirmative !== null) {
+      buttons.concat(
         {
           text: 'Yes', 
           onPress: () => {
@@ -171,8 +177,21 @@ export default function Profile({ navigation }) {
               console.log('Yes tapped'); 
             }
           },
-        },
-      ],
+        });
+    }
+
+    if (onNegative === null && onAffirmative === null) {
+      buttons.concat(
+        {
+          text: "OK", 
+          onPress: () => console.log("OK Pressed")
+        });
+    }
+
+    Alert.alert(
+      '',
+      message,
+      [buttons],
       { cancelable: true }
     );
   };
@@ -208,7 +227,8 @@ export default function Profile({ navigation }) {
           </Pressable>
           <Pressable
               onPress={handleRemoveAvatar}
-              style={[styles.buttonContainer, styles.secondaryContainer]}>
+              style={[styles.buttonContainer, styles.secondaryContainer]}
+              disabled={avatar === null}>
               <Text style={[styles.button, styles.secondaryButton]}>Remove</Text>
           </Pressable>
         </View>
