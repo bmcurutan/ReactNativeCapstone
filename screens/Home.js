@@ -75,7 +75,7 @@ export default function Home({ navigation }) {
   const renderItem = ({ item }) => <Item name={item.name} price={item.price} description={item.description} image={item.image} category={item.category} />;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View contentContainerStyle={styles.container}>
       <Pressable 
         style={styles.avatarButtonContainer}
         onPress={handleProfile}>
@@ -105,7 +105,7 @@ export default function Home({ navigation }) {
           keyExtractor={item => item.name} 
           renderItem={renderItem} />
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -115,21 +115,22 @@ const styles = StyleSheet.create({
     },
     headerContainer: {
       backgroundColor: '#3B4C45',
-      padding: 16,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
       marginTop: 16
     },
     header: {
       color: '#F4CE14',
-      fontSize: 40
+      fontSize: 34
     },
     subheader: {
       color: 'white',
-      fontSize: 28
+      fontSize: 22
     },
     details: {
       color: 'white',
-      fontSize: 18,
-      marginTop: 16
+      fontSize: 16,
+      marginTop: 8
     },
     logoImage: {
       height: 40, 
@@ -139,8 +140,7 @@ const styles = StyleSheet.create({
     },
     headerImage: {
       width: '100%',
-      height: 160,
-
+      height: 140,
       resizeMode: 'contain',
       marginTop: 16,
       borderRadius: 16
