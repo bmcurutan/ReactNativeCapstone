@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react'; 
 import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSQLiteContext } from 'expo-sqlite';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import * as schema from '@/db/schema';
+import { lists, Task, tasks } from '@/db/schema';
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 
 export default function Home({ navigation }) {
   const [avatar, setAvatar] = useState(null);
@@ -10,6 +15,10 @@ export default function Home({ navigation }) {
 
   const API_URL =
   'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
+
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db, { schema });
+  useDrizzleStudio(db);
 
   useEffect(() => {
     const getInfo = async() => {
@@ -47,20 +56,17 @@ export default function Home({ navigation }) {
     };
 
     const getData = async () => {
+      console.log('get data');
       try {
-        let menuItems = getMenuItems();
-        console.log(menuItems);
-        // console.log("TEST" + menuItems.length);
-        // // if (!menuItems.length) {
-        //   // menuItems = await fetchData();
-        //   // console.log(menuItems);
-        // //   saveMenuItems(menuItems);
-        // // }
+    
+      await drizzleDb.insert(lists).values([{ name: 'List 1' }, { name: 'List 2'}]);
+      const data = await drizzleDb.query.lists.findMany();
+      console.log(data);
+      const result = await drizzleDb.select().from(tasks);
 
-        // setData(menuItems);
-
+      console.log(result);
       } catch(e) {
-        Alert.alert(e.message);
+        console.log(e);
       }
     };
 
