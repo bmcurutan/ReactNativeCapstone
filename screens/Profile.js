@@ -1,52 +1,58 @@
 import React, { useState, useEffect } from 'react'; 
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { TextInputMask } from 'react-native-masked-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { validateEmail } from '../utils/utils';
 
 export default function Profile({ navigation }) {
-    const [firstName, setFirstName] = useState(''); 
-    const isFirstNameEmpty = firstName.trim() === '';
+  const [avatar, setAvatar] = useState(null);
 
-    const [lastName, setLastName] = useState(''); 
+  const [firstName, setFirstName] = useState(''); 
+  const isFirstNameEmpty = firstName.trim() === '';
 
-    const [email, setEmail] = useState(''); 
-    const isEmailValid = email.trim() !== '' && validateEmail(email)
+  const [lastName, setLastName] = useState(''); 
 
-    const [phone, setPhone] = useState('');
-    const isPhoneValid = phone === null || phone.length === 12;
+  const [email, setEmail] = useState(''); 
+  const isEmailValid = email.trim() !== '' && validateEmail(email)
 
-    const [isStatusesChecked, setStatuses] = useState(false);
-    const [isPasswordChecked, setPassword] = useState(false);
-    const [isOffersChecked, setOffers] = useState(false);
-    const [isNewsletterChecked, setNewsletter] = useState(false);
+  const [phone, setPhone] = useState('');
+  const isPhoneValid = phone === null || phone.length === 12;
 
-    useEffect(() => {
-        const getInfo = async () => {
-          const firstName = await AsyncStorage.getItem('firstName');
-          const lastName = await AsyncStorage.getItem('lastName');
-          const email = await AsyncStorage.getItem('email');
-          const phone = await AsyncStorage.getItem('phone');
+  const [isStatusesChecked, setStatuses] = useState(false);
+  const [isPasswordChecked, setPassword] = useState(false);
+  const [isOffersChecked, setOffers] = useState(false);
+  const [isNewsletterChecked, setNewsletter] = useState(false);
 
-          setFirstName(firstName); 
-          setLastName(lastName);
-          setEmail(email);
-          setPhone(phone);
+  useEffect(() => {
+      const getInfo = async () => {
+        const avatar = await AsyncStorage.getItem('avatar');
+        setAvatar(avatar)
 
-          const statuses = await AsyncStorage.getItem('statuses');
-          const password = await AsyncStorage.getItem('password');
-          const offers = await AsyncStorage.getItem('offers');
-          const newsletter = await AsyncStorage.getItem('newsletter');
+        const firstName = await AsyncStorage.getItem('firstName');
+        const lastName = await AsyncStorage.getItem('lastName');
+        const email = await AsyncStorage.getItem('email');
+        const phone = await AsyncStorage.getItem('phone');
 
-          setStatuses(statuses === 'true' ? true : false);
-          setPassword(password === 'true' ? true : false);
-          setOffers(offers === 'true' ? true : false);
-          setNewsletter(newsletter === 'true' ? true : false);
-        };
-    
-      getInfo();
-    }, []);
+        setFirstName(firstName); 
+        setLastName(lastName);
+        setEmail(email);
+        setPhone(phone);
+
+        const statuses = await AsyncStorage.getItem('statuses');
+        const password = await AsyncStorage.getItem('password');
+        const offers = await AsyncStorage.getItem('offers');
+        const newsletter = await AsyncStorage.getItem('newsletter');
+
+        setStatuses(statuses === 'true' ? true : false);
+        setPassword(password === 'true' ? true : false);
+        setOffers(offers === 'true' ? true : false);
+        setNewsletter(newsletter === 'true' ? true : false);
+      };
+  
+    getInfo();
+  }, []);
 
   const handleFirstName = (name) => {
     if (/^[A-Za-z’'-\s]*$/.test(name)) {
@@ -61,20 +67,55 @@ export default function Profile({ navigation }) {
   };  
 
   const handleLogout = async () => {
-    console.log("Log out tapped");
+    console.log('Log out tapped');
 
-    await AsyncStorage.removeItem('loggedIn'); 
-    navigation.navigate('Onboarding');
+    showAlert(
+      'Are you sure you want to log out?',
+      async () => {
+        await AsyncStorage.removeItem('loggedIn'); 
+        navigation.navigate('Onboarding');
+      },
+      () => {}
+    );
+  };
+
+  const handleUpdateAvatar = async () => {
+    console.log('Update tapped');
+
+    showAlert(
+      'Are you sure you want to update your avatar?',
+      async () => {
+        pickImage()
+      },
+      () => {}
+    );
+  };
+
+  const handleRemoveAvatar = async () => {
+    console.log('Remove tapped');
+
+    showAlert(
+      'Are you sure you want to remove your avatar?',
+      async () => {
+        await AsyncStorage.removeItem('avatar'); 
+        setAvatar(null);
+      },
+      () => {}
+    );
+  };
+
+  const handleBack = {
+
   };
 
   const handleSave = async () => {
-    console.log("Save tapped");
+    console.log('Save tapped');
 
     if (!isPhoneValid) {
-      showAlert("Please enter a valid phone number or clear the input field")
+      showAlert('Please enter a valid phone number or clear the input field');
 
     } else {
-      showAlert("Profile saved")
+      showAlert('Profile saved')
 
       await AsyncStorage.setItem('firstName', firstName);
       await AsyncStorage.setItem('lastName', lastName);
@@ -88,21 +129,56 @@ export default function Profile({ navigation }) {
     }
   };
 
-  const showAlert = (message) => {
-    Alert.alert("", message, [
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri
+      setAvatar(uri);
+      await AsyncStorage.setItem('avatar', uri);
+    }
+  };
+
+  const showAlert = (message, onAffirmative, onNegative) => {
+    Alert.alert(
+      '',
+      message,
+      [
         {
-          text: "OK", 
-          onPress: () => console.log("OK tapped")
-        }
+          text: 'No',
+          onPress: () => {
+            if (onNegative) {
+              onNegative();
+            } else {
+              console.log('No tapped'); 
+            }
+          },
+        },
+        {
+          text: 'Yes', 
+          onPress: () => {
+            if (onAffirmative) {
+              onAffirmative();
+            } else {
+              console.log('Yes tapped'); 
+            }
+          },
+        },
       ],
-      { cancelable: true } 
+      { cancelable: true }
     );
   };
 
   return (
       <ScrollView contentContainerStyle={styles.container}>
         <Pressable
-            onPress={handleSave}
+            onPress={handleBack}
             style={styles.backButtonContainer}>
             <Text style={styles.button}>←</Text>
         </Pressable>
@@ -111,6 +187,29 @@ export default function Profile({ navigation }) {
             source={require('../assets/images/little-lemon-logo.png')} />
 
         <Text style={styles.headerText}>Personal Information</Text>
+
+        <Text style={styles.inputLabel}>Avatar</Text>
+        <View style={styles.rowContainer}>  
+          <View style={styles.avatarContainer}>
+          {!avatar &&
+            <Text style={styles.avatarText}>{firstName[0]}{lastName[0]}</Text>
+          }
+          {avatar &&
+            <Image style={styles.avatarImage}
+              source={{url: avatar}} />
+          }
+          </View>
+          <Pressable
+              onPress={handleUpdateAvatar}
+              style={styles.buttonContainer}>
+              <Text style={styles.button}>Update</Text>
+          </Pressable>
+          <Pressable
+              onPress={handleRemoveAvatar}
+              style={styles.buttonContainer}>
+              <Text style={styles.button}>Remove</Text>
+          </Pressable>
+        </View>
 
         <Text style={styles.inputLabel}>First Name</Text>
         <TextInput style={styles.input}
@@ -144,28 +243,28 @@ export default function Profile({ navigation }) {
         <Text style={styles.headerText}>Email Notifications</Text>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor="#3B4C45"
+          <CheckBox checkedColor='#3B4C45'
             checked={isStatusesChecked} 
             onPress={() => setStatuses(!isStatusesChecked)} />
           <Text style={styles.checkboxLabel}>Order Statuses</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor="#3B4C45"
+          <CheckBox checkedColor='#3B4C45'
             checked={isPasswordChecked} 
             onPress={() => setPassword(!isPasswordChecked)} />
           <Text style={styles.checkboxLabel}>Password Changes</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor="#3B4C45"
+          <CheckBox checkedColor='#3B4C45'
             checked={isOffersChecked}
             onPress={() => setOffers(!isOffersChecked)} />
           <Text style={styles.checkboxLabel}>Special Offers</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor="#3B4C45"
+          <CheckBox checkedColor='#3B4C45'
             checked={isNewsletterChecked}
             onPress={() => setNewsletter(!isNewsletterChecked)} />
           <Text style={styles.checkboxLabel}>Newsletter</Text>
@@ -192,8 +291,27 @@ export default function Profile({ navigation }) {
     
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      marginHorizontal: 16
+      marginHorizontal: 16,
+      paddingBottom: 44
+    },
+    avatarContainer: {
+      backgroundColor: 'gray',
+      height: 80, 
+      width: 80,
+      justifyContent: 'center',
+      borderRadius: 40,
+      marginVertical: 16,
+      marginRight: 16
+    },
+    avatarText: {
+      fontSize: 36,
+      textAlign: 'center',
+      color: 'white'
+    },
+    avatarImage: {
+      height: 80,
+      width: 80,
+      borderRadius: 40
     },
     headerImage: {
       height: 40, 
@@ -226,7 +344,7 @@ export default function Profile({ navigation }) {
       marginRight: 16,
       backgroundColor: '#3B4C45',
       borderRadius: 8,
-      width: '40%',
+      width: '30%',
       height: 40,
       justifyContent: 'center'
     },
