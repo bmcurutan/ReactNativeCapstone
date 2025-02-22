@@ -21,7 +21,7 @@ export default function Onboarding({ navigation }) {
   }, []);
 
   const handleLogin = async() => {
-    console.log('Log in tapped')
+    console.log('Next tapped')
 
     if (!isFirstNameEmpty && isEmailValid) {
       await AsyncStorage.setItem('loggedIn', 'true');
@@ -63,7 +63,7 @@ export default function Onboarding({ navigation }) {
         style={[styles.buttonContainer, 
           (isFirstNameEmpty || !isEmailValid) && styles.buttonDisabled]} 
         disabled={isFirstNameEmpty || !isEmailValid}>
-          <Text style={styles.button}>Log In</Text>
+          <Text style={styles.button}>Next</Text>
       </Pressable>
     </ScrollView>
   );

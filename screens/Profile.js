@@ -73,6 +73,18 @@ export default function Profile({ navigation }) {
       'Are you sure you want to log out?',
       async() => {
         await AsyncStorage.removeItem('loggedIn'); 
+        await AsyncStorage.removeItem('avatar'); 
+
+        await AsyncStorage.removeItem('firstName'); 
+        await AsyncStorage.removeItem('lastName'); 
+        await AsyncStorage.removeItem('email'); 
+        await AsyncStorage.removeItem('phone'); 
+
+        await AsyncStorage.removeItem('statuses'); 
+        await AsyncStorage.removeItem('password'); 
+        await AsyncStorage.removeItem('offers'); 
+        await AsyncStorage.removeItem('newsletter'); 
+
         navigation.navigate('Onboarding');
       },
       () => {}
