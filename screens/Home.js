@@ -189,13 +189,15 @@ export default function Home({ navigation }) {
           source={require('../assets/images/bruschetta.png')} />
       </View>
 
-      <Searchbar
-        placeholder="Search"
-        placeholderTextColor="lightgray"
-        onChangeText={handleSearchChange}
-        value={searchBarText}
-        style={styles.searchBar}
-        iconColor="#495E57" />
+      <View style={{backgroundColor: '#495E57'}}>
+        <Searchbar
+          placeholder="Search"
+          placeholderTextColor="lightgray"
+          onChangeText={handleSearchChange}
+          value={searchBarText}
+          style={styles.searchBar}
+          iconColor="#495E57" />
+      </View>
 
       <Filters
         selections={filterSelections}
@@ -217,7 +219,7 @@ const styles = StyleSheet.create({
       flex: 1
     },
     headerContainer: {
-      backgroundColor: '#3B4C45',
+      backgroundColor: '#495E57',
       paddingVertical: 8,
       paddingHorizontal: 16,
       marginTop: 16
@@ -253,7 +255,7 @@ const styles = StyleSheet.create({
       height: 50,
       width: 50,
       borderRadius: 25,
-      backgroundColor: '#3B4C45',
+      backgroundColor: '#495E57',
       justifyContent: 'center',
       alignContent: 'center'
     },

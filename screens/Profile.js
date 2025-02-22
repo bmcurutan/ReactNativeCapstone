@@ -275,28 +275,28 @@ export default function Profile({ navigation }) {
         <Text style={styles.headerText}>Email Notifications</Text>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor='#3B4C45'
+          <CheckBox checkedColor='#495E57'
             checked={isStatusesChecked} 
             onPress={() => setStatuses(!isStatusesChecked)} />
           <Text style={styles.checkboxLabel}>Order Statuses</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor='#3B4C45'
+          <CheckBox checkedColor='#495E57'
             checked={isPasswordChecked} 
             onPress={() => setPassword(!isPasswordChecked)} />
           <Text style={styles.checkboxLabel}>Password Changes</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor='#3B4C45'
+          <CheckBox checkedColor='#495E57'
             checked={isOffersChecked}
             onPress={() => setOffers(!isOffersChecked)} />
           <Text style={styles.checkboxLabel}>Special Offers</Text>
         </View>
 
         <View style={styles.rowContainer}>
-          <CheckBox checkedColor='#3B4C45'
+          <CheckBox checkedColor='#495E57'
             checked={isNewsletterChecked}
             onPress={() => setNewsletter(!isNewsletterChecked)} />
           <Text style={styles.checkboxLabel}>Newsletter</Text>
@@ -354,7 +354,7 @@ export default function Profile({ navigation }) {
     headerText: {
       paddingVertical: 16,
       fontSize: 22,
-      color: '#3B4C45'
+      color: '#495E57'
     },
     inputLabel: {
       fontSize: 16, 
@@ -367,14 +367,14 @@ export default function Profile({ navigation }) {
       marginBottom: 16, 
       padding: 8, 
       fontSize: 16, 
-      borderColor: '#3B4C45', 
+      borderColor: '#495E57', 
       borderWidth: 1,
       borderRadius: 8
     }, 
     buttonContainer: {
       marginTop: 24,
       marginRight: 16,
-      backgroundColor: '#3B4C45',
+      backgroundColor: '#495E57',
       borderRadius: 8,
       width: '30%',
       height: 40,
@@ -382,7 +382,7 @@ export default function Profile({ navigation }) {
     },
     secondaryContainer: {
       backgroundColor: 'white',
-      borderColor: '#3B4C45',
+      borderColor: '#495E57',
       borderWidth: 1,
       borderRadius: 8,
     },
@@ -391,7 +391,7 @@ export default function Profile({ navigation }) {
       height: 50,
       width: 50,
       borderRadius: 25,
-      backgroundColor: '#3B4C45',
+      backgroundColor: '#495E57',
       justifyContent: 'center',
       alignContent: 'center'
     },
@@ -405,7 +405,7 @@ export default function Profile({ navigation }) {
       padding: 8
     },
     secondaryButton: {
-      color: '#3B4C45',
+      color: '#495E57',
       padding: 8
     },
     logoutButton: {
