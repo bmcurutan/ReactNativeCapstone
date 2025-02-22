@@ -3,6 +3,7 @@ import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { or, eq } from 'drizzle-orm';
 import * as schema from '@/db/schema';
 import { menuitems } from '@/db/schema';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
@@ -15,7 +16,7 @@ export default function Home({ navigation }) {
   const [lastInitial, setLastInitial] = useState(''); 
   const [data, setData] = useState([]);
 
-  const categories = [...new Set(data.map((item) => item.category))];
+  const categories = ['starters', 'mains', 'desserts']; // [...new Set(data.map((item) => item.category))];
   const [filterSelections, setFilterSelections] = useState(categories.map(() => false));
 
   const API_URL =
@@ -71,7 +72,7 @@ export default function Home({ navigation }) {
     }
 
     const getData = async () => {
-      console.log('get data');
+      // console.log('get data');
       try {
         let menuItems = await drizzleDb.query.menuitems.findMany();
         if (!menuItems.length) {
@@ -97,8 +98,35 @@ export default function Home({ navigation }) {
   const handleFiltersChange = async(index) => {
     const arrayCopy = [...filterSelections];
     arrayCopy[index] = !filterSelections[index];
+    console.log(arrayCopy);
     setFilterSelections(arrayCopy);
-    console.log(filterSelections);
+    // console.log(filterSelections);
+
+    filterData(arrayCopy);
+  };
+
+  const filterData = async(arrayCopy) => {
+    let selectedFilters = [];
+    // console.log(arrayCopy);
+    arrayCopy.forEach((selection, index) => {
+      // console.log(selection);
+      if (selection) {
+        selectedFilters.push(categories[index]);
+      }
+    });
+    console.log(selectedFilters);
+
+    try {
+      let filteredItems = await drizzleDb.query.menuitems.findMany({
+        where: or(
+          ...selectedFilters.map((category) => eq(menuitems.category, category))
+          )
+      });
+      console.log(filteredItems);
+      setData(filteredItems);
+    } catch(e) {
+      console.log(e);
+    }
   };
 
   const renderItem = ({ item }) => <Item name={item.name} price={item.price} description={item.description} image={item.image} category={item.category} />;
@@ -140,7 +168,7 @@ export default function Home({ navigation }) {
         <FlatList data={data} 
           keyExtractor={item => item.name} 
           renderItem={renderItem} 
-          ListFooterComponent={<View style={{height: 100}}/>} />
+          ListFooterComponent={<View style={{height: 48}}/>} />
       </View>
     </View>
   );
