@@ -3,19 +3,21 @@ import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { or, eq } from 'drizzle-orm';
+import { and, or, eq, like } from 'drizzle-orm';
 import * as schema from '@/db/schema';
 import { menuitems } from '@/db/schema';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import Filters from '../components/Filters';
 import Item from '../components/Item';
+import { Searchbar } from 'react-native-paper';
 
 export default function Home({ navigation }) {
   const [avatar, setAvatar] = useState(null);
   const [firstInitial, setFirstInitial] = useState(''); 
   const [lastInitial, setLastInitial] = useState(''); 
-  const [data, setData] = useState([]);
 
+  const [data, setData] = useState([]);
+  const [searchBarText, setSearchBarText] = useState('');
   const categories = ['starters', 'mains', 'desserts']; // [...new Set(data.map((item) => item.category))];
   const [filterSelections, setFilterSelections] = useState(categories.map(() => false));
 
@@ -95,6 +97,36 @@ export default function Home({ navigation }) {
     navigation.navigate('Profile');
   };  
 
+  const handleSearchChange = (text) => {
+    setSearchBarText(text);
+    searchAndFilterData(text);
+  };
+
+  const searchAndFilterData = async(text) => {
+    console.log('search and filter data');
+    let selectedFilters = [];
+    filterSelections.forEach((selection, index) => {
+      if (selection) {
+        selectedFilters.push(categories[index]);
+      }
+    });
+    console.log(selectedFilters);
+    console.log(text);
+
+    try {
+      let filteredItems = await drizzleDb.query.menuitems.findMany({
+        where: and(
+          or(...selectedFilters.map((category) => eq(menuitems.category, category))),
+          like(menuitems.name, `%${text.toLowerCase()}%`) 
+        )
+      });
+      console.log(filteredItems);
+      setData(filteredItems);
+    } catch(e) {
+      console.log(e);
+    }
+  };
+
   const handleFiltersChange = async(index) => {
     const arrayCopy = [...filterSelections];
     arrayCopy[index] = !filterSelections[index];
@@ -118,9 +150,7 @@ export default function Home({ navigation }) {
 
     try {
       let filteredItems = await drizzleDb.query.menuitems.findMany({
-        where: or(
-          ...selectedFilters.map((category) => eq(menuitems.category, category))
-          )
+        where: or(...selectedFilters.map((category) => eq(menuitems.category, category)))
       });
       console.log(filteredItems);
       setData(filteredItems);
@@ -158,6 +188,14 @@ export default function Home({ navigation }) {
         <Image style={styles.headerImage}
           source={require('../assets/images/bruschetta.png')} />
       </View>
+
+      <Searchbar
+        placeholder="Search"
+        placeholderTextColor="lightgray"
+        onChangeText={handleSearchChange}
+        value={searchBarText}
+        style={styles.searchBar}
+        iconColor="#495E57" />
 
       <Filters
         selections={filterSelections}
@@ -242,5 +280,11 @@ const styles = StyleSheet.create({
     rowContainer: {
       width: '100%',
       flexDirection: 'row'
-    }
+    },
+    searchBar: {
+      margin: 16,
+      backgroundColor: 'white',
+      borderWidth: 1,
+      borderColor: '#495E57'
+    },
 });
