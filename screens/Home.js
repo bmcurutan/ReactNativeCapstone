@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as schema from '@/db/schema';
-import { lists, Task, tasks } from '@/db/schema';
+import { MenuItem, menuitems } from '@/db/schema';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 
 export default function Home({ navigation }) {
@@ -35,6 +35,7 @@ export default function Home({ navigation }) {
     getInfo();
 
     const fetchData = async() => {
+      console.log('fetch data');
       try { 
         const response = await fetch(API_URL);
         const json = await response.json();
@@ -47,7 +48,7 @@ export default function Home({ navigation }) {
           category: item.category
         }));
         // console.log(mappedData);
-        setData(mappedData)
+        // setData(mappedData)
         return mappedData;
   
       } catch (error) {
@@ -55,16 +56,25 @@ export default function Home({ navigation }) {
       } 
     };
 
+    const saveMenuItems = async(menuItems) => {
+      console.log('save menu items');
+      try {
+        await drizzleDb.insert(menuitems).values(menuItems);
+      } catch(e) {
+        console.log(e);
+      }
+    }
+
     const getData = async () => {
       console.log('get data');
       try {
-    
-      await drizzleDb.insert(lists).values([{ name: 'List 1' }, { name: 'List 2'}]);
-      const data = await drizzleDb.query.lists.findMany();
-      console.log(data);
-      const result = await drizzleDb.select().from(tasks);
+        let menuItems = await drizzleDb.query.menuitems.findMany();
+        if (!menuItems.length) {
+          menuItems = await fetchData();
+          saveMenuItems(menuItems);
+        }
+        setData(menuItems);
 
-      console.log(result);
       } catch(e) {
         console.log(e);
       }
@@ -99,7 +109,7 @@ export default function Home({ navigation }) {
   const renderItem = ({ item }) => <Item name={item.name} price={item.price} description={item.description} image={item.image} category={item.category} />;
 
   return (
-    <View contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Pressable 
         style={styles.avatarButtonContainer}
         onPress={handleProfile}>
@@ -115,19 +125,22 @@ export default function Home({ navigation }) {
       <Image style={styles.logoImage}
         source={require('../assets/images/little-lemon-logo.png')} />
 
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>Little Lemon</Text>
-        <Text style={styles.subheader}>Chicago</Text>
-        <Text style={styles.details}>We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</Text>
+      <View style={[styles.headerContainer, styles.rowContainer]}>
+        <View style={{ width: '70%' }}>
+          <Text style={styles.header}>Little Lemon</Text>
+          <Text style={styles.subheader}>Chicago</Text>
+          <Text style={styles.details}>We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</Text>
+        </View>
         
         <Image style={styles.headerImage}
-          source={require('../assets/images/bruschetta.jpg')} />
+          source={require('../assets/images/bruschetta.png')} />
       </View>
 
       <View style={styles.menuContainer}>
         <FlatList data={data} 
           keyExtractor={item => item.name} 
-          renderItem={renderItem} />
+          renderItem={renderItem} 
+          ListFooterComponent={<View style={{height: 100}}/>} />
       </View>
     </View>
   );
@@ -135,7 +148,7 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
     container: {
-      paddingBottom: 44
+      flex: 1
     },
     headerContainer: {
       backgroundColor: '#3B4C45',
@@ -163,11 +176,10 @@ const styles = StyleSheet.create({
       marginTop: -30
     },
     headerImage: {
-      width: '100%',
-      height: 140,
+      height: 120,
       resizeMode: 'contain',
-      marginTop: 16,
-      borderRadius: 16
+      marginTop: 24,
+      marginRight: 16
     },
     avatarButtonContainer: {
       marginTop: 64,
@@ -211,6 +223,7 @@ const styles = StyleSheet.create({
       marginBottom: 16
     },
     menuContainer: {
+      flex: 1,
       paddingHorizontal: 16
     },
     item: {

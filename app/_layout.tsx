@@ -6,7 +6,7 @@ import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from '@/drizzle/migrations';
 
-export const DATABASE_NAME = 'tasks';
+export const DATABASE_NAME = 'little_lemon';
 
 export default function RootLayout() {
   const expoDb = openDatabaseSync(DATABASE_NAME);
@@ -20,7 +20,7 @@ export default function RootLayout() {
         options={{ enableChangeListener: true }}
         useSuspense>
         <Stack>
-          <Stack.Screen name="index" options={{ title: 'Tasks', headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           {/* return <Stack screenOptions={{ headerShown: false }} />; */}
         </Stack>
       </SQLiteProvider>

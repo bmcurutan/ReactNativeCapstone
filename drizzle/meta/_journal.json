@@ -8,6 +8,13 @@
       "when": 1740124432723,
       "tag": "0000_cooing_phantom_reporter",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1740166616213,
+      "tag": "0001_whole_shadow_king",
+      "breakpoints": true
     }
   ]
 }
