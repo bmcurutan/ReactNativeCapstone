@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react'; 
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as schema from '@/db/schema';
-import { MenuItem, menuitems } from '@/db/schema';
+import { menuitems } from '@/db/schema';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
+import Filters from '../components/Filters';
+import Item from '../components/Item';
 
 export default function Home({ navigation }) {
   const [avatar, setAvatar] = useState(null);
   const [firstInitial, setFirstInitial] = useState(''); 
   const [lastInitial, setLastInitial] = useState(''); 
   const [data, setData] = useState([]);
+
+  const categories = [...new Set(data.map((item) => item.category))];
+  const [filterSelections, setFilterSelections] = useState(categories.map(() => false));
 
   const API_URL =
   'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
@@ -23,7 +28,7 @@ export default function Home({ navigation }) {
   useEffect(() => {
     const getInfo = async() => {
       const avatar = await AsyncStorage.getItem('avatar');
-      setAvatar(avatar)
+      setAvatar(avatar);
 
       const firstName = await AsyncStorage.getItem('firstName');
       const lastName = await AsyncStorage.getItem('lastName');
@@ -74,6 +79,7 @@ export default function Home({ navigation }) {
           saveMenuItems(menuItems);
         }
         setData(menuItems);
+        setFilterSelections(categories.map(() => false));
 
       } catch(e) {
         console.log(e);
@@ -88,22 +94,11 @@ export default function Home({ navigation }) {
     navigation.navigate('Profile');
   };  
 
-  const Item = ({ name, price, description, image, category }) => {
-    const imageUrl = `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${image}?raw=true`;
-    // console.log(imageUrl); 
-  
-    return (
-      <View style={styles.item}>
-        <View style={styles.rowContainer}>  
-          <Image style={styles.image} source={{ uri: imageUrl }} />
-          <View>
-            <Text style={styles.name}>{name}</Text>
-            <Text style={styles.description}>{description}</Text>
-            <Text style={styles.price}>${price}</Text>
-          </View>
-        </View>
-      </View>
-    );
+  const handleFiltersChange = async(index) => {
+    const arrayCopy = [...filterSelections];
+    arrayCopy[index] = !filterSelections[index];
+    setFilterSelections(arrayCopy);
+    console.log(filterSelections);
   };
 
   const renderItem = ({ item }) => <Item name={item.name} price={item.price} description={item.description} image={item.image} category={item.category} />;
@@ -135,6 +130,11 @@ export default function Home({ navigation }) {
         <Image style={styles.headerImage}
           source={require('../assets/images/bruschetta.png')} />
       </View>
+
+      <Filters
+        selections={filterSelections}
+        onChange={handleFiltersChange}
+        categories={categories} />
 
       <View style={styles.menuContainer}>
         <FlatList data={data} 
@@ -207,38 +207,12 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       color: 'white'
     },
-    name: {
-      fontSize: 18,
-      fontWeight: 'bold'
-    },
-    description: {
-      fontSize: 14,
-      marginVertical: 8,
-      width: 280
-    },
-    price: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: 'gray',
-      marginBottom: 16
-    },
     menuContainer: {
       flex: 1,
       paddingHorizontal: 16
     },
-    item: {
-      borderBottomWidth: 0.5,
-      borderColor: 'gray',
-      paddingTop: 16
-    },
-    image: {
-      width: 70, 
-      height: 70,
-      borderRadius: 8,
-      marginRight: 8
-    },
     rowContainer: {
       width: '100%',
       flexDirection: 'row'
-    },
+    }
 });
